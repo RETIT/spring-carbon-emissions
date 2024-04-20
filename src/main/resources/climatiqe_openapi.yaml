@@ -1,0 +1,1767 @@
+openapi: 3.0.1
+info:
+  title: api
+  version: 0.0.7
+paths:
+  /classifications/estimate:
+    post:
+      description: >
+        This endpoint lets you specify an industry classification code (ISIC or
+        NACE) 
+
+        and have Climatiq automatically select the appropriate emission factor. 
+
+        One industry code might be linked to more than one emission factor. 
+
+        If that happens, Climatiq will automatically select the most
+        conservative emission factor. 
+
+        If you would like to specify exactly what emission factor to use, you
+        can specify other attributes to filter on, such as year, source or
+        region.
+      operationId: ClassificationsService.estimate
+      tags:
+        - ClassificationsService
+      parameters: []
+      responses:
+        '200':
+          description: >-
+            An Estimation that describes the total amount of co2e and the
+            emission factor used.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstimationEstimateResponse'
+      security: &ref_0
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassificationsClassificationRequest'
+  /compute:
+    get:
+      operationId: CloudComputingService.metadata
+      tags:
+        - CloudComputingService
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloudComputingMetadataResponse'
+      security: *ref_0
+  /compute/{provider}/cpu:
+    post:
+      description: >-
+        Calculate total estimated emissions based on the usage for a set number
+        of virtual CPU's (vCPUs)
+      operationId: CloudComputingService.cpu
+      tags:
+        - CloudComputingService
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/CloudComputingProviderId'
+      responses:
+        '200':
+          description: >-
+            You will get an Estimation back with the co2e for the power
+            consumption for the allocated memory for the given duration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstimationEstimateResponse'
+      security: *ref_0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloudComputingCpuRequest'
+  /compute/{provider}/storage:
+    post:
+      description: >-
+        Calculate total estimated emissions based on storing data for a set
+        amount of time.
+      operationId: CloudComputingService.storage
+      tags:
+        - CloudComputingService
+      parameters:
+        - name: provider
+          in: path
+          description: >-
+            Where the :provider path argument must be replaced with the id of
+            the supported cloud providers.
+          required: true
+          schema:
+            $ref: '#/components/schemas/CloudComputingProviderId'
+      responses:
+        '200':
+          description: >-
+            You will get an Estimation back with the CO2e for the storage of the
+            data for the given duration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstimationEstimateResponse'
+      security: *ref_0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloudComputingStorageRequest'
+  /compute/{provider}/memory:
+    post:
+      description: >-
+        Calculate total estimated emissions based on having memory (RAM)
+        available for a set amount of time.
+      operationId: CloudComputingService.memory
+      tags:
+        - CloudComputingService
+      parameters:
+        - name: provider
+          in: path
+          description: >-
+            Where the :provider path argument must be replaced with the id of
+            the supported cloud providers.
+          required: true
+          schema:
+            $ref: '#/components/schemas/CloudComputingProviderId'
+      responses:
+        '200':
+          description: >-
+            You will get an Estimation back with the co2e emitted by having the
+            allocated memory available for the given duration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstimationEstimateResponse'
+      security: *ref_0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloudComputingMemoryRequest'
+  /compute/{provider}/instance:
+    post:
+      description: >-
+        Calculate total estimated emissions based on an instance
+        available for a set amount of time.
+      operationId: CloudComputingService.instance
+      tags:
+        - CloudComputingService
+      parameters:
+        - name: provider
+          in: path
+          description: >-
+            Where the :provider path argument must be replaced with the id of
+            the supported cloud providers.
+          required: true
+          schema:
+            $ref: '#/components/schemas/CloudComputingProviderId'
+      responses:
+        '200':
+          description: >-
+            You will get an Estimation back with the co2e emitted by having the
+            allocated memory available for the given duration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceEstimationEstimateResponse'
+      security: *ref_0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloudComputingInstanceRequest'
+  /custom-activities/estimate:
+    post:
+      description: >
+        Calculate total estimated emissions produced for a particular activity
+        in kgCO2e using a custom activity that you have defined under the
+        Activity Mapping tab inside your Climatiq Dashboard.
+
+        A custom activity label provides the same flexibility as the ID it maps
+        to. This can happen when multiple emission factors share an emission
+        factor id or because you have mapped the same custom activity to
+        different emission factor ids.
+
+        You can provide parameters to select emission factors by filtering using
+        year, region, data source and more as described in our selector section.
+        If there are multiple emission factors Climatiq will automatically pick
+        the most conservative one.
+      operationId: CustomActivitiesService.estimate
+      tags:
+        - CustomActivitiesService
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstimationEstimateResponse'
+      security: *ref_0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomActivitiescustomActivityRequest'
+  /custom-activities/batch:
+    post:
+      description: >-
+        Batch estimations for custom activities work like regular Batch
+        Estimates, allowing you to calculate multiple emission estimations in a
+        single request, all based on custom activities mapped in the Climatiq
+        Dashboard. Currently limited to maximum 100 operations per request.
+      operationId: CustomActivitiesService.batchCustomActivities
+      tags:
+        - CustomActivitiesService
+      parameters: []
+      responses:
+        '200':
+          description: List of results for every operation.
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/CustomActivitiesbatchCustomActivitiesResponse
+      security: *ref_0
+      requestBody:
+        description: >-
+          List of custom activity estimation operations. Every operation should
+          follow the same syntax followed by the custom activitiy estimate
+          request object.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CustomActivitiescustomActivityRequest'
+  /search:
+    get:
+      description: >
+        Allows you to determine what emission factors are available to be used
+        in your estimates.
+
+        You can search for free-text queries with the query parameter, or filter
+        by parameters such as category, source, region, year calculation_method,
+        lca_activity or id.
+
+        If you are using the query parameter, the results will be returned in
+        order of how well they match your free-text query.
+
+        This endpoint is paginated, and will return current_page and last_page
+        so you can determine which page you are on. You switch pages by using
+        the page query parameter.
+      operationId: EmissionFactorsService.search
+      tags:
+        - EmissionFactorsService
+      parameters:
+        - name: query
+          in: query
+          description: >
+            A free-text query that will match ids, names, descriptions, etc. of
+            emission factors. 
+
+            This uses fuzzy matching, so your query does not need to be
+            precise. 
+
+            Spaces need to be encoded as + or %20 . 
+
+            Default is ""
+          required: false
+          schema:
+            type: string
+        - name: uuid
+          in: query
+          description: "Filter by the ID of a specific emission factor.\tDefault is `all`"
+          required: false
+          schema:
+            type: string
+        - name: activity_id
+          in: query
+          description: >-
+            Filter by the id of a specific activity. Multiple emission factors
+            might share the same activity. You may specify an asterix (*) at the
+            end of the id to act as a wildcard character, matching any ids that
+            begin with the string before the asterix.
+          required: false
+          schema:
+            type: string
+        - name: id
+          in: query
+          description: >-
+            A deprecated alias for activity_id. Use activity_id instead, as this
+            will be deprecated next version.
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: Filters by emission factor category
+          required: false
+          schema:
+            type: string
+        - name: sector
+          in: query
+          description: Filters by emission factor sector
+          required: false
+          schema:
+            type: string
+        - name: source
+          in: query
+          description: Filters emission factors by data source
+          required: false
+          schema:
+            type: string
+        - name: year
+          in: query
+          description: Filters emission factors by year factor was released
+          required: false
+          schema:
+            type: string
+        - name: region
+          in: query
+          description: >-
+            Filters emission factors by geographic region to which it applies.
+            You may specify an asterix (*) at the end of the region to act as a
+            wildcard character, matching any regions, such as sub-regions, that
+            begin with the string before the asterix.
+          required: false
+          schema:
+            type: string
+        - name: lca_activity
+          in: query
+          description: >-
+            The Life Cycle Assessment (LCA) activity with which this factor is
+            associated.
+          required: false
+          schema:
+            type: string
+        - name: unit_type
+          in: query
+          description: >-
+            Filters emission factors by what unit (such as money, energy or
+            volume) the factor accepts.
+          required: false
+          schema:
+            type: string
+        - name: calculation_method
+          in: query
+          description: >-
+            The calculation method that is used to calculate the emission
+            factor. Can be either ar4 or ar5
+          required: false
+          schema:
+            $ref: '#/components/schemas/EstimationCalculationMethod'
+        - name: page
+          in: query
+          description: Which page of results to retrieve.
+          required: false
+          schema:
+            type: integer
+        - name: results_per_page
+          in: query
+          description: How many results to return per page. Max is 100.
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/EmissionFactorSearchEmissionFactorsResponse
+      security: *ref_0
+  /emission-factors/years:
+    get:
+      description: >-
+        Not all emission factors have data for all years. This endpoint returns
+        a list of years available for a given query.
+      operationId: EmissionFactorsService.getYears
+      tags:
+        - EmissionFactorsService
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: source
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: region
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: year
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: calculation_method
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: lca_activity
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: activity_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmissionFactorYearsResponse'
+      security: *ref_0
+  /emission-factors/sources:
+    get:
+      operationId: EmissionFactorsService.getSources
+      tags:
+        - EmissionFactorsService
+      parameters:
+        - name: sector
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: source
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: region
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: year
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: calculation_method
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: lca_activity
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: iactivity_idd
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmissionFactorSourcesResponse'
+      security: *ref_0
+  /emission-factors/regions:
+    get:
+      description: >-
+        Not all emission factors have data for all geographic regions. This
+        endpoint returns a list of regions available for a given query.
+      operationId: EmissionFactorsService.getRegions
+      tags:
+        - EmissionFactorsService
+      parameters:
+        - name: sector
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: source
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: region
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: year
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: calculation_method
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: lca_activity
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: activity_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmissionFactorRegionsResponse'
+      security: *ref_0
+  /emission-factors/categories:
+    get:
+      description: Returns a list of categories available for a given query.
+      operationId: EmissionFactorsService.getCategories
+      tags:
+        - EmissionFactorsService
+      parameters:
+        - name: sector
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: source
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: region
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: year
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: calculation_method
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: lca_activity
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: activity_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmissionFactorCategoriesResponse'
+      security: *ref_0
+  /emission-factors/sectors:
+    get:
+      description: Returns a list of sectors available for a given query.
+      operationId: EmissionFactorsService.getSectors
+      tags:
+        - EmissionFactorsService
+      parameters:
+        - name: sector
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: source
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: region
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: year
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: calculation_method
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: lca_activity
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: activity_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmissionFactorSectorsResponse'
+      security: *ref_0
+  /emission-factors/lca-activities:
+    get:
+      description: >-
+        Returns a list of life cycle assessment(LCA) activities available for a
+        given query.
+      operationId: EmissionFactorsService.getLcaActivities
+      tags:
+        - EmissionFactorsService
+      parameters:
+        - name: sector
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: source
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: region
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: year
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: calculation_method
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: lca_activity
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: activity_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmissionFactorLcaActivitiesResponse'
+      security: *ref_0
+  /emission-factors/:
+    get:
+      description: Returns a list of unit types available for a given query.
+      operationId: EmissionFactorsService.getUnitTypes
+      tags:
+        - EmissionFactorsService
+      parameters:
+        - name: sector
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: source
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: region
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: year
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: calculation_method
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: lca_activity
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: activity_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmissionFactorUnitTypesResponse'
+      security: *ref_0
+  /estimate:
+    post:
+      description: >-
+        Calculate total estimated emissions produced for a particular activity,
+        in `kgCO2e``, using the available emission factors. All requests are
+        performed by sending a POST request to the following endpoint
+      operationId: EstimationService.estimate
+      tags:
+        - EstimationService
+      parameters: []
+      responses:
+        '200':
+          description: >-
+            An Estimation that describes the total amount of co2e and the
+            emission factor used.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstimationEstimateResponse'
+      security: *ref_0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstimationEstimateRequest'
+  /batch:
+    post:
+      description: >-
+        This endpoint returns an Estimation, which includes the total amount of
+        emissions in kgCO2e and the emission factor used to calculate the
+        emissions.
+      operationId: EstimationService.batchEstimate
+      tags:
+        - EstimationService
+      parameters: []
+      responses:
+        '200':
+          description: The response includes a list of Estimations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstimationBatchEstimateResponse'
+      security: *ref_0
+      requestBody:
+        description: >-
+          List of estimation operations. Every operation should follow the same
+          syntax followed by the estimate request object.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/EstimationEstimateRequest'
+  /travel/flights:
+    post:
+      description: >-
+        Calculate total estimated emissions produced by passenger flights
+        between the specified airports
+      operationId: FlightsService.travelFlights
+      tags:
+        - FlightsService
+      parameters: []
+      responses:
+        '200':
+          description: >-
+            The response includes the total emissions for the trip in kgCO2e,
+            and the emissions for each leg of the trip.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlightsTripEmissions'
+      security: *ref_0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlightsTravelFlightsRequest'
+  /freight/flights:
+    post:
+      description: >-
+        Calculate total estimated emissions produced by freight flights between
+        the specified airport.
+      operationId: FlightsService.freightFlights
+      tags:
+        - FlightsService
+      parameters: []
+      responses:
+        '200':
+          description: >-
+            The response includes the total emissions for the trip in kgCO2e,
+            and the emissions for each leg of the trip.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlightsTripEmissions'
+      security: *ref_0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlightsFreightFlightsRequest'
+components:
+  schemas:
+    ClassificationsClassificationSelector:
+      type: object
+      description: A selector with classification data
+      properties:
+        classification_code:
+          type: string
+          description: The classification code.
+        classification_type:
+          type: string
+          description: The classification scheme; currently supported are nace2 or isic4.
+        source:
+          type: string
+          description: Emission factor data source name.
+        region:
+          type: string
+          description: Geographic region to which the emission factor applies.
+        region_fallback:
+          type: boolean
+          description: >-
+            Set this to true if you're willing to accept a less specific
+            geographical region than the one you've specified. Climatiq will
+            then attempt to fall back to the larger region if it does not find
+            any emission factors with the initial region. Default is false
+        year:
+          type: string
+          description: Year for which the emission factor applies.
+        lca_activity:
+          type: string
+          description: >-
+            The Life Cycle Assessment (LCA) activity to which this factor is
+            associated.
+        calculation_method:
+          $ref: '#/components/schemas/EstimationCalculationMethod'
+          description: >-
+            The calculation method that will be used to calculate the CO2e
+            emission factor.
+      required:
+        - classification_code
+        - classification_type
+    ClassificationsClassificationRequest:
+      type: object
+      properties:
+        classification:
+          $ref: '#/components/schemas/ClassificationsClassificationSelector'
+        parameters:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+        - classification
+        - parameters
+    CloudComputingProviderId:
+      type: string
+    CloudComputingBaseRequest:
+      type: object
+      properties:
+        region:
+          type: string
+          description: >-
+            The region that is relevant for the calculation, as specified by the
+            cloud provider.
+        duration_unit:
+          type: string
+          description: >-
+            The unit the duration value is in. The values accepted here are the
+            same as in the Time unit.
+      required:
+        - region
+    CloudComputingCpuRequest:
+      type: object
+      properties:
+        region:
+          type: string
+          description: >-
+            The region of the cloud provider.
+        cpu_count:
+          type: integer
+          description: The number of virtual cores you are calculating for.
+        cpu_load:
+          type: number
+          format: double
+          description: >-
+            The average load across all of your vCPU's specified as a float
+            between 0 and 1.
+        duration:
+          type: number
+          format: double
+          description: How long the vCPUs are running for. Default is h
+      required:
+        - region
+        - cpu_count
+        - cpu_load
+        - duration
+      allOf:
+        - $ref: '#/components/schemas/CloudComputingBaseRequest'
+    CloudComputingStorageRequest:
+      type: object
+      properties:
+        storage_type:
+          $ref: '#/components/schemas/CloudComputingStorageType'
+          description: Which type of hard drive the data is stored on.
+        data:
+          type: number
+          format: double
+          description: >-
+            How much data is stored. If you use managed services for storage
+            that replicate data across multiple datacenters or hard drives, you
+            might need to take your data amount and multiply it by a replication
+            factor.
+        data_unit:
+          type: string
+          description: "The unit the data value is in. The values accepted here are the same as in the Data unit.\tDefault is MB"
+        duration:
+          type: number
+          format: double
+          description: How long the data is stored for.
+      required:
+        - storage_type
+        - data
+        - duration
+      allOf:
+        - $ref: '#/components/schemas/CloudComputingBaseRequest'
+    CloudComputingMemoryRequest:
+      type: object
+      properties:
+        region:
+          type: string
+          description: >-
+            The region of the cloud provider.
+        data:
+          type: number
+          format: double
+          description: >-
+            How much memory you have allocated. As memory requires power to be
+            available even if unused, you should put in the amount of memory
+            that you have available - not only the amount you're using.
+        data_unit:
+          type: string
+          description: >-
+            The unit the data value is in. The values accepted here are the same
+            as in the Data unit.
+        duration:
+          type: number
+          format: double
+          description: How long the data is stored for.
+        duration_unit:
+          type: string
+          description: >-
+            The unit the duration value is in. The values accepted here are the same
+            as in the Data unit.
+      required:
+        - region
+        - data
+        - duration
+    CloudComputingInstanceRequest:
+      type: object
+      properties:
+        region:
+          type: string
+          description: >-
+            The region of the cloud provider.
+        instance:
+          type: string
+          description: >-
+            The instance type.
+        average_vcpu_utilization:
+          type: number
+          format: double
+          description: >-
+            How much the CPU of the service was utilized.
+        duration:
+          type: number
+          format: double
+          description: How long the data is stored for.
+        duration_unit:
+          type: string
+          description: >-
+            The unit the duration value is in. The values accepted here are the same
+            as in the Data unit.
+      required:
+        - region
+        - instance
+        - data
+        - duration
+    CloudComputingMetadataResponse:
+      type: object
+      properties:
+        cloud_providers:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CloudComputingCloudProviderMetadata'
+          description: >-
+            An object where each key is the id for a cloud provider, and the
+            corresponding value contains additional data about that cloud
+            provider.
+      required:
+        - cloud_providers
+    CloudComputingCloudProvider:
+      type: string
+      enum:
+        - aws
+        - gcp
+        - azure
+    CloudComputingCloudProviderMetadata:
+      type: object
+      properties:
+        provider_full_name:
+          type: string
+          description: The full, human-readable name for the provider
+        provider_id:
+          type: string
+          description: >-
+            The id of the cloud provider. This is the value you must use when
+            specifying provider in the computing endpoints
+        cpu_regions:
+          type: array
+          items:
+            type: string
+          description: >-
+            The different strings you can use for regions in the CPU endpoint
+            for this provider.
+        storage_regions:
+          type: array
+          items:
+            type: string
+          description: >-
+            The different strings you can use for regions in the Storage
+            endpoint for this provider.
+        memory_regions:
+          type: array
+          items:
+            type: string
+          description: >-
+            The different strings you can use for regions in the Memory endpoint
+            for this provider.
+      required:
+        - provider_full_name
+        - provider_id
+        - cpu_regions
+        - storage_regions
+        - memory_regions
+    CloudComputingStorageType:
+      type: string
+      enum:
+        - ssd
+        - hdd
+      description: >-
+        Which type of hard drive the data is stored on. The cloud provider does
+        not always specify this for managed services, so you might have to make
+        an informed guess.
+    CustomActivitiescustomActivityRequest:
+      type: object
+      properties:
+        custom_activity:
+          $ref: '#/components/schemas/CustomActivitiescustomActivitySelector'
+          description: >-
+            A selector allowing the use of a custom activity label defined in
+            the activity mapping tab in the Climatiq Dashboard
+        parameters:
+          type: object
+          additionalProperties: {}
+          description: >-
+            Emission factor parameters. The parameter object changes depending
+            on the EF selected.
+      required:
+        - custom_activity
+        - parameters
+    CustomActivitiescustomActivitySelector:
+      type: object
+      properties:
+        label:
+          type: string
+          description: The custom activity label you have specified in your dashboard.
+        source:
+          type: string
+          description: Emission factor data source name.
+        region:
+          type: string
+          description: Geographic region to which the emission factor applies.
+        region_fallback:
+          type: boolean
+          description: >-
+            Set this to true if you're willing to accept a less specific
+            geographical region than the one you've specified. Climatiq will
+            then attempt to fall back to the larger region if it does not find
+            any emission factors with the initial region. Default is false
+        year:
+          type: string
+          description: Year for which the emission factor applies.
+        lca_activity:
+          type: string
+          description: >-
+            The Life Cycle Assessment (LCA) activity to which this factor is
+            associated.
+        calculation_method:
+          $ref: '#/components/schemas/EstimationCalculationMethod'
+          description: >-
+            The calculation method that will be used to calculate the CO2e
+            emission factor.
+      required:
+        - label
+    CustomActivitiesbatchCustomActivitiesResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/EstimationEstimateResponse'
+      required:
+        - results
+    EmissionFactorSearchEmissionFactorsResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmissionFactorEmissionFactor'
+          description: A list of emission factors for this page.
+        current_page:
+          type: integer
+          description: The current page you have retrieved
+        last_page:
+          type: integer
+          description: The last page that there are results for.
+        total_results:
+          type: integer
+          description: How many results there are in total across all pages.
+        possible_filters:
+          $ref: '#/components/schemas/EmissionFactorPossibleEmissionFactorFilters'
+          description: >-
+            A list of potential filters you can use to further narrow down your
+            query. This will specify which sources, years etc. your current data
+            contains.
+      required:
+        - results
+        - current_page
+        - last_page
+        - total_results
+        - possible_filters
+    EmissionFactorEmissionFactor:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: The unique ID describing this particular emission factor.
+        activity_id:
+          type: string
+          description: >-
+            The ID describing the activity that this emission factor applies to.
+            Multiple emission factors can share the same activity_id, e.g. if
+            they are from a different source or apply to a different region.
+        id:
+          type: string
+          description: >-
+            A deprecated alias for activity_id. Use activity_id instead, as this
+            will be removed in the next version.
+        access_type:
+          type: string
+          description: >-
+            Whether or not the data is publicly available or private to your
+            project. Can be either private or public. Public emission factors
+            are available to all, while private emission factors are only
+            accessible to you.
+        name:
+          type: string
+          description: Emission factor name.
+        category:
+          type: string
+          description: Emission factor category.
+        sector:
+          type: string
+          description: Emission factor sector.
+        source:
+          type: string
+          description: Emission factor publisher.
+        source_link:
+          type: string
+          description: Link to emission factor publisher.
+        uncertainty:
+          type: number
+          format: double
+          description: Emission factor uncertainty factor (%).
+        year:
+          type: string
+          description: Year for which the emission factor applies.
+        region:
+          type: string
+          description: Geographic region to which the emission factor applies (UN/LOCODE).
+        region_name:
+          type: string
+          description: Geographic region to which the emission factor applies (in English).
+        description:
+          type: string
+          description: Emission factor description.
+        unit_type:
+          type: array
+          items:
+            type: string
+          description: A list of Unit types that this emission factor accepts.
+        unit:
+          type: string
+          description: The unit in which the factor field is expressed.
+        lca_activity:
+          type: string
+          description: >-
+            Which LCA activity the emission factor corresponds to. Read more
+            about life cycle assessments here.
+        supported_calculation_methods:
+          type: array
+          items:
+            type: string
+          description: The methods of CO2e calculation supported for this emission factor
+        factor:
+          type: number
+          format: double
+          description: >-
+            CO2e emission factor value, expressed in kgCO2e emitted per unit of
+            activity provided in the unit field
+        factor_calculation_method:
+          $ref: '#/components/schemas/EstimationCalculationMethod'
+          description: >-
+            Indicates which conversion values were used (IPCC 4th or 5th
+            Assessment Report) to generate the returned CO2e emission factor
+        factor_calculation_origin:
+          $ref: '#/components/schemas/EmissionFactorFactorCalculationOrigin'
+          description: >-
+            Indicates whether the CO2e emission factor provided in this response
+            was provided by the source or calculated by Climatiq
+        constituent_gases:
+          $ref: '#/components/schemas/EstimationConstituentGases'
+          description: Indicates which gases the CO2e emission factor is composed of.
+      required:
+        - uuid
+        - activity_id
+        - id
+        - access_type
+        - name
+        - category
+        - sector
+        - source
+        - source_link
+        - year
+        - region
+        - region_name
+        - description
+        - unit_type
+        - unit
+        - lca_activity
+        - supported_calculation_methods
+        - factor
+        - factor_calculation_method
+        - factor_calculation_origin
+        - constituent_gases
+    EmissionFactorFactorCalculationOrigin:
+      type: string
+      enum:
+        - climatiq
+        - source
+    EmissionFactorPossibleEmissionFactorFilters:
+      type: object
+      properties:
+        year:
+          type: array
+          items:
+            type: string
+          description: Filters emission factors by year factor applies to
+        source:
+          type: array
+          items:
+            type: string
+          description: Filters emission factors by data source
+        region:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmissionFactorRegion'
+          description: Filters emission factors by geographic region
+        category:
+          type: array
+          items:
+            type: string
+          description: Filters by emission factor category
+        sector:
+          type: array
+          items:
+            type: string
+          description: Filters by emission factor sector
+        unit_type:
+          type: array
+          items:
+            type: string
+          description: Filters by unit type
+      required:
+        - year
+        - source
+        - region
+        - category
+        - sector
+        - unit_type
+    EmissionFactorRegion:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Region ID
+        name:
+          type: string
+          description: Region name
+      required:
+        - id
+        - name
+    EmissionFactorYearsResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: string
+          description: List of years available for the given query.
+      required:
+        - results
+    EmissionFactorSourcesResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: string
+          description: List of sources available for the given query.
+      required:
+        - results
+    EmissionFactorRegionsResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmissionFactorRegion'
+          description: List of regions available for the given query.
+      required:
+        - results
+    EmissionFactorCategoriesResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: string
+          description: List of categories available for the given query.
+      required:
+        - results
+    EmissionFactorSectorsResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: string
+          description: List of sectors available for the given query.
+      required:
+        - results
+    EmissionFactorLcaActivitiesResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: string
+          description: >-
+            List of life cycle assessment activities available for the given
+            query.
+      required:
+        - results
+    EmissionFactorUnitTypesResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: string
+          description: List of units available for the given query.
+      required:
+        - results
+    EstimationEstimateRequest:
+      type: object
+      properties:
+        emission_factor:
+          $ref: '#/components/schemas/EstimationEmissionSelector'
+          description: Emission factor ID or selection parameters selector.
+        parameters:
+          description: >-
+            Emission factor parameters. The parameter object changes depending
+            on the EF selected.
+      required:
+        - emission_factor
+        - parameters
+    EstimationEmissionSelector:
+      type: object
+      properties:
+        activity_id:
+          type: string
+        source:
+          type: string
+        region:
+          type: string
+        region_fallback:
+          type: boolean
+        year:
+          type: string
+        lca_activity:
+          type: string
+        calculation_method:
+          $ref: '#/components/schemas/EstimationCalculationMethod'
+      required:
+        - activity_id
+    EstimationCalculationMethod:
+      type: string
+      enum:
+        - ar4
+        - ar5
+    EstimationEstimateResponse:
+      type: object
+      properties:
+        co2e:
+          type: number
+          format: double
+        co2e_unit:
+          type: string
+        co2e_calculation_method:
+          type: string
+        co2e_calculation_origin:
+          type: string
+        emission_factor:
+          $ref: '#/components/schemas/EstimationUsedEmissionFactor'
+        constituent_gases:
+          $ref: '#/components/schemas/EstimationConstituentGases'
+        activity_data:
+          $ref: '#/components/schemas/ActivityData'
+        audit_trail:
+          type: string
+      required:
+        - co2e
+        - co2e_unit
+        - co2e_calculation_method
+        - co2e_calculation_origin
+        - emission_factor
+        - constituent_gases
+    ActivityData:
+      type: object
+      properties:
+        activity_value:
+          type: number
+          format: double
+        activity_unit:
+          type: string
+    InstanceEstimationEstimateResponse:
+      type: object
+      properties:
+        total_co2e:
+          type: number
+          format: double
+        total_co2e_unit:
+          type: string
+        memory_estimate:
+          $ref: '#/components/schemas/EstimationEstimateResponse'
+        cpu_estimate:
+          $ref: '#/components/schemas/EstimationEstimateResponse'
+        embodied_cpu_estimate:
+          $ref: '#/components/schemas/EstimationEstimateResponse'
+      required:
+        - total_co2e
+        - total_co2e_unit
+    EstimationUsedEmissionFactor:
+      type: object
+      properties:
+        name:
+          type: string
+        activity_id:
+          type: string
+        id:
+          type: string
+        access_type:
+          type: string
+        source:
+          type: string
+        source_dataset:
+          type: string
+        year:
+          type: string
+        region:
+          type: string
+        category:
+          type: string
+        source_lca_activity:
+          type: string
+        data_quality_flags:
+          type: array
+          items:
+            type: string
+      required:
+        - activity_id
+        - source
+        - year
+        - region
+        - category
+        - lca_activity
+    EstimationBatchEstimateResponse:
+      type: object
+      properties:
+        response:
+          type: array
+          items:
+            $ref: '#/components/schemas/EstimationBatchItemEstimate'
+          description: List of results for every operation.
+      required:
+        - response
+    EstimationBatchItemEstimate:
+      oneOf:
+        - type: object
+          allOf:
+            - $ref: '#/components/schemas/EstimationEstimateResponse'
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - response
+        - type: object
+          allOf:
+            - $ref: '#/components/schemas/EstimationEstimateError'
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - error
+    EstimationEstimateError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Error message
+      required:
+        - error
+        - message
+    EstimationConstituentGases:
+      type: object
+      properties:
+        co2e_total:
+          type: number
+          format: double
+          description: >-
+            The total amount of GHG emitted per unit of activity expressed as
+            kgCO2e, as reported by the source. It is null for Climatiq-performed
+            calculations.
+        co2e_other:
+          type: number
+          format: double
+          description: >-
+            The total amount of GHG emitted that are not CO2, CH4 or N20 -
+            expressed in kgCO2e emitted per unit of activity, as reported by the
+            source.
+        co2:
+          type: number
+          format: double
+          description: >-
+            The amount of carbon dioxide (CO2) emitted per unit of activity
+            expressed as kgCO2, as reported by the source.
+        ch4:
+          type: number
+          format: double
+          description: >-
+            The amount of methane (CH4) emitted per unit of activity expressed
+            as kgCH4, as reported by the source.
+        n2o:
+          type: number
+          format: double
+          description: >-
+            The amount of nitrous oxide (N2O) emitted per unit of activity
+            expressed as kgN2O, as reported by the source.
+    FlightsBaseLeg:
+      type: object
+      properties:
+        from:
+          type: string
+          description: Start of flight leg, expressed in an IATA code
+        to:
+          type: string
+          description: End of flight leg, expressed in an IATA code
+      required:
+        - from
+        - to
+    FlightsTravelLeg:
+      type: object
+      properties:
+        passengers:
+          type: integer
+          description: How many passengers are on the flight? Default is 1
+        class:
+          type: string
+          description: Which class the flight was on.
+        emission_factor:
+          $ref: '#/components/schemas/EstimationEmissionSelector'
+          description: >-
+            This endpoint will automatically pick the highest emission factor
+            which is eligible for the flight. If you want to override the
+            automatic emission factor selection you can provide a selector. You
+            are then fully responsible for emission factor selection. The
+            selector must end up selecting an emission factor that supports the
+            PassengerOverDistance unit.
+      allOf:
+        - $ref: '#/components/schemas/FlightsBaseLeg'
+    FlightsTripEmissions:
+      type: object
+      properties:
+        co2e:
+          type: number
+          format: double
+          description: Total carbon dioxide equivalent for entire trip.
+        cot2e_unit:
+          type: string
+          description: The unit in which the co2e field is expressed.
+        legs:
+          type: array
+          items:
+            $ref: '#/components/schemas/EstimationEstimateResponse'
+          description: >-
+            List of estimations, one for each leg in the trip. These are
+            returned in the same order as the flight legs.
+      required:
+        - co2e
+        - cot2e_unit
+        - legs
+    FlightsFreightLeg:
+      type: object
+      properties:
+        weight:
+          type: number
+          format: double
+          description: Weight in the defined unit
+        weight_unit:
+          type: string
+          description: "Unit of weight. Allowed values are kg for metric kilograms, t for tonnes (metric tons) or ton for US short tons.\tDefault kg"
+        emission_factor:
+          $ref: '#/components/schemas/EstimationEmissionSelector'
+          description: >-
+            This endpoint will automatically pick the highest emission factor
+            which is eligible for the flight. If you want to override the
+            automatic emission factor selection you can provide a selector. You
+            are then fully responsible for emission factor selection. The
+            selector must end up selecting an emission factor that supports the
+            WeightOverDistance unit.
+      required:
+        - weight
+        - weight_unit
+        - emission_factor
+      allOf:
+        - $ref: '#/components/schemas/FlightsBaseLeg'
+    FlightsTravelFlightsRequest:
+      type: object
+      properties:
+        legs:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlightsTravelLeg'
+          description: An array of one or more legs in a flight
+      required:
+        - legs
+    FlightsFreightFlightsRequest:
+      type: object
+      properties:
+        legs:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlightsFreightLeg'
+          description: An array of one or more legs in a flight
+      required:
+        - legs
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+servers:
+  - url: https://api.climatiq.io
