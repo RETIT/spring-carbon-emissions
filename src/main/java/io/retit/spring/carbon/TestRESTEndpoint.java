@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * This is an example REST service that provides three endpoints for HTTP GET / POST and DELETE.
+ */
 @RestController
 @RequestMapping("/test-rest-endpoint")
 public class TestRESTEndpoint {
@@ -36,6 +39,15 @@ public class TestRESTEndpoint {
         return "Published Metric with Attributes: " + attributes;
     }
 
+    /**
+     * This is an example of a business functionality that is being used by the REST service endpoints.
+     * <p>
+     * Before and after the service operation the resource demands of the business function are being measured.
+     *
+     * @param httpMethod - the HTTP method (GET/POST/DELETE) of the endpoint calling the business function
+     * @param apiCall    - the name of the API call (getData, postData, deleteData) calling the business function
+     * @return - the OpenTelemetry Attributes published along with the resource demand metrics
+     */
     private Attributes callBusinessFunctionAndPublishMetric(String httpMethod, String apiCall) throws InterruptedException {
 
         ResourceDemandMeasurementService.Measurement startMeasurements = resourceDemandMeasurementService.measure();

@@ -1,7 +1,3 @@
-# Copyright The OpenTelemetry Authors
-# SPDX-License-Identifier: Apache-2.0
-
-
 receivers:
   otlp:
     protocols:
@@ -38,15 +34,7 @@ connectors:
 
 service:
   pipelines:
-    #traces:
-    #  receivers: [otlp]
-    #  processors: [batch]
-    #  exporters: [otlp, logging, spanmetrics]
     metrics:
       receivers: [otlp]
       processors: [filter, transform, batch]
       exporters: [prometheus]
-    #logs:
-    #  receivers: [otlp]
-    #  processors: [batch]
-    #  exporters: [logging]

@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
- * This job publishes Climatiqe data continuously via OpenTelemetry to Prometheus.
+ * This job publishes Climatiq emission data continuously as OpenTelemetry metrics.
  */
 @Slf4j
 @Service
@@ -32,9 +32,9 @@ public class ClimatiqBackgroundPublisher {
     private OpenTelemetryService otelService;
 
     /**
-     * This method is useful of you want to compute the SCI score for dedicated services
+     * This method schedules the Climatiq background publisher.
      *
-     * @throws ApiException - in case the call to Climatiq fails
+     * @throws ApiException - in case the call to Climatiq fails.
      */
     @Scheduled(fixedDelay = 60000)
     void scheduleCO2OfResources() throws ApiException {
@@ -50,6 +50,14 @@ public class ClimatiqBackgroundPublisher {
         publishMemoryCO2EmissionsForRegionAndProvider(cloudComputingServiceApi, attributes);
     }
 
+    /**
+     * This method publishes the CO2 emissions of one GB memory consumption for one minute in the configured
+     * region and cloud provider. This data is later used for calculating the emissions of a single API call.
+     *
+     * @param cloudComputingServiceApi - an API instance to interact with the Climatiq API.
+     * @param attributes               - the attributes published along with the emission data.
+     * @throws ApiException - in case the call to Climatiq fails.
+     */
     private void publishMemoryCO2EmissionsForRegionAndProvider(CloudComputingServiceApi cloudComputingServiceApi, Attributes attributes) throws ApiException {
         CloudComputingMemoryRequest cloudComputingMemoryRequest = new CloudComputingMemoryRequest();
 
@@ -65,6 +73,14 @@ public class ClimatiqBackgroundPublisher {
         otelService.publishMemoryCO2EmissionsForRegionAndProvider((long) (memCo2eInKg * 1000 * 1000), attributes);
     }
 
+    /**
+     * This method publishes the CO2 emissions of one CPU core for one minute in the configured
+     * region and cloud provider. This data is later used for calculating the emissions of a single API call.
+     *
+     * @param cloudComputingServiceApi - an API instance to interact with the Climatiq API.
+     * @param attributes               - the attributes published along with the emission data.
+     * @throws ApiException - in case the call to Climatiq fails.
+     */
     private void publishCpuCO2EmissionsForRegionAndProvider(final CloudComputingServiceApi cloudComputingServiceApi, final Attributes attributes) throws ApiException {
         CloudComputingCpuRequest cloudComputingCpuRequest = new CloudComputingCpuRequest();
 
